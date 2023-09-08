@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Decimer</title>
+  <style>
+    /* Add some basic styling */
+    body {
+      font-family: Arial, sans-serif;
+    }
+    /* Add some style to table */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      height: 90vh;  /* 100vh is the total height of the viewport */
+    }
+    tr {
+      height: 30%;
+    }
+    td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: center;
+      vertical-align: middle;
+    }
+    /* Style for table images */
+    .table-img {
+      max-height: 100%;
+      cursor: pointer;
+    }
+    /* Add some style for the modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.9);
+    }
+    .modal-content {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+    }
+    .modal-content img {
+      max-height: 100%;  /* Ensure the image does not exceed viewport height */
+      margin: 20px; /* Adjust the space between images */
+    }
+    .modal-content #segmentImg {
+      max-height: none;
+    }
+  </style>
+  <script>
+    function showModal(segment_src, rdkit_src){
+      const modal = document.getElementById("myModal");
+      const segmentImg = document.getElementById("segmentImg");
+      const rdkitImg = document.getElementById("rdkitImg");
+
+      modal.style.display = "block";
+      segmentImg.style.height = '500px';
+      rdkitImg.style.height = 'auto';
+
+      segmentImg.src = segment_src;
+      rdkitImg.src = rdkit_src;
+    }
+    function closeModal(){
+      document.getElementById("myModal").style.display = "none";
+    }
+    function downloadSmiles() {
+        var smiles = [];
+        var buttons = document.querySelectorAll('button[data-smiles]');
+        for (var i=0; i<buttons.length; i++) {
+            smiles.push(buttons.item(i).getAttribute('data-smiles'));
+        }
+        var text = smiles.join('\n');
+        var element = document.createElement('a');
+        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+        element.setAttribute('download', "smiles.txt");
+        element.style.display = 'none';
+        document.body.appendChild(element);
+        element.click();
+        document.body.removeChild(element);
+    }
+  </script>
+</head>
+<body>
+  <table id="dataTable">
+    <tr>
+      <th>Segment Image</th>
+      <th>Rdkit Image</th>
+      <th>SMILES <button onclick="downloadSmiles()">Download All SMILES</button></th>
+    </tr>
+    {% for item in data %}
+    <tr>
+      <td><img class="table-img" src="data:image/png;base64,{{ item[0] }}" alt="Segment Image" onclick="showModal(this.src, 'data:image/png;base64,{{ item[1] }}')" /></td>
+      <td><img class="table-img" src="data:image/png;base64,{{ item[1] }}" alt="Rdkit Image" onclick="showModal('data:image/png;base64,{{ item[0] }}', this.src)" /></td>
+      <td><button data-smiles="{{ item[2] }}" onclick="navigator.clipboard.writeText('{{ item[2] }}')">Copy SMILES</button></td>
+    </tr>
+    {% endfor %}
+  </table>
+
+  <!-- The Modal -->
+  <div id="myModal" class="modal" onclick="closeModal()">
+    <!-- Modal Content (The Image) -->
+    <div class="modal-content">
+      <img id="segmentImg" class="modal-img">
+      <img id="rdkitImg" class="modal-img">
+    </div>
+  </div>
+</body>
+</html>

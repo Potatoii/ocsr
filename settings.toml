@@ -1,0 +1,8 @@
+host = "0.0.0.0"
+port = 5000
+server_protocol = "http"
+site_root = "./"
+log_name = "app.log"
+stdout_level = "INFO"
+file_level = "INFO"
+rotation = "50MB"

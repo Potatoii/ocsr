@@ -1,0 +1,23 @@
+version: '3.3'
+services:
+  ocsr:
+    build: .
+    container_name: ocsr
+    ports:
+      - "5000:5000"
+    hostname: ocsr
+    restart: "unless-stopped"
+    volumes:
+      - .:/ocsr
+    command: "python3.10 main.py"
+    working_dir: /ocsr
+    environment:
+      - DOCKER_DEFAULT_PLATFORM=linux/amd64
+      - NVIDIA_VISIBLE_DEVICES=all
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [ gpu ]
